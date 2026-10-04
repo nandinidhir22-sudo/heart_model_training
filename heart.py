@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import joblib
+import pickle
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -9,10 +9,9 @@ from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-
 BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "heart_disease_models.pkl"
 DATA_PATH = BASE_DIR / "Heart_dataset"
-MODEL_PATH = BASE_DIR / "heart_disease_models.joblib"
 TARGET = "HeartDisease"
 
 
@@ -73,14 +72,16 @@ logistic_pipeline.fit(X, y)
 linear_pipeline.fit(X, y)
 
 # Save both fitted pipelines and the exact feature-column order.
-joblib.dump(
-    {
-        "logistic_model": logistic_pipeline,
-        "linear_model": linear_pipeline,
-        "feature_columns": X.columns.tolist(),
-    },
-    MODEL_PATH,
-)
+model_bundle = {
+    "logistic_model": logistic_pipeline,
+    "linear_model": linear_pipeline,
+    "feature_columns": X.columns.tolist(),
+}
+
+with open(MODEL_PATH, "wb") as file:
+    pickle.dump(model_bundle, file, protocol=pickle.HIGHEST_PROTOCOL)
+
+print(f"Saved models to: {MODEL_PATH}")
 
 print(f"Saved models to: {MODEL_PATH}")
 print(f"Expected input columns: {X.columns.tolist()}")

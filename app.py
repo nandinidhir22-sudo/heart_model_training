@@ -1,18 +1,22 @@
-from pathlib import Path
-
-import pickle
-import numpy as np
 import pandas as pd
+import pickle
+from pathlib import Path
 import streamlit as st
-
 
 BASE_DIR = Path(__file__).resolve().parent
 MODEL_PATH = BASE_DIR / "heart_disease_models.pkl"
 
-
 @st.cache_resource
 def load_models():
-    return pickle.load(open(MODEL_PATH, "rb"))
+    with open(MODEL_PATH, "rb") as file:
+        return pickle.load(file)
+
+
+bundle = load_models()
+logistic_model = bundle["logistic_model"]
+linear_model = bundle["linear_model"]
+FEATURE_COLUMNS = bundle["feature_columns"]
+
 
 
 st.title("Heart Disease Prediction")
